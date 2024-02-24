@@ -5,6 +5,7 @@ mod map_builder;
 mod spawner;
 mod systems;
 mod turn_state;
+use std::path::Path;
 
 mod prelude {
     pub use bracket_lib::prelude::*;
@@ -15,6 +16,7 @@ mod prelude {
     pub const SCREEN_HEIGHT: i32 = 50;
     pub const DISPLAY_WIDTH: i32 = SCREEN_WIDTH / 2;
     pub const DISPLAY_HEIGHT: i32 = SCREEN_HEIGHT / 2;
+    pub const OS_TYPE: &str = std::env::consts::OS;
     pub use crate::camera::*;
     pub use crate::components::*;
     pub use crate::map::*;
@@ -91,12 +93,18 @@ impl GameState for State {
 }
 
 fn main() -> BError {
+    let mut resources_path: &Path;
+    match OS_TYPE {
+        "windows" => {resources_path = Path::new(".\\resources");},
+        _ => {resources_path = Path::new("../resources");},
+    }
+    
     let context = BTermBuilder::new()
         .with_title("Rusty Roguelike")
         .with_fps_cap(60.0)
         .with_dimensions(DISPLAY_WIDTH, DISPLAY_HEIGHT)
         .with_tile_dimensions(32, 32)
-        .with_resource_path("../resources")
+        .with_resource_path(&resources_path.display())
         .with_font("dungeonfont.png", 32, 32)
         .with_font("terminal8x8.png", 8, 8)
         .with_simple_console(DISPLAY_WIDTH, DISPLAY_HEIGHT, "dungeonfont.png")
